@@ -1,0 +1,7 @@
+{
+  "name": "Health Expense Reimbursement System",
+  "description": "A user-friendly portal for employees to upload health expense receipts using OCR for data extraction, and an intuitive dashboard for HR to review and approve claims.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

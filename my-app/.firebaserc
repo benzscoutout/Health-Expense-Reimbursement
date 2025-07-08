@@ -1,0 +1,19 @@
+{
+  "projects": {
+    "default": "scoutout-mang-prod"
+  },
+  "targets": {
+    "scoutout-mang-prod": {
+      "hosting": {}
+    },
+    "scoutout-mang-test-e17bf": {
+      "hosting": {
+        "health-expense-reimbursement-system-test": [
+          "health-expense-reimbursement-system-test"
+        ]
+      }
+    }
+  },
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
+}

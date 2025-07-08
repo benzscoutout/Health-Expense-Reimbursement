@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Health expense claims collection
+    match /health_expense/{claimId} {
+      // Allow read if user is HR or the claim belongs to the user
+      allow read: if request.auth != null && (
+        request.auth.token.role == 'hr' || 
+        resource.data.employeeName == request.auth.token.email
+      );
+      
+      // Allow create if user is authenticated
+      allow create: if request.auth != null;
+      
+      // Allow update if user is HR
+      allow update: if request.auth != null && request.auth.token.role == 'hr';
+      
+      // Allow delete if user is HR
+      allow delete: if request.auth != null && request.auth.token.role == 'hr';
+    }
+  }
+} 

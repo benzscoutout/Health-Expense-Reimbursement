@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "scoutout-mang-test-e17bf",
+     "test": "scoutout-mang-test-e17bf",
+    "prod": "scoutout-mang-prod"
+  }
+} 

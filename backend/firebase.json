@@ -1,0 +1,43 @@
+{
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18"
+  },
+  "hosting": [
+    {
+      "target": "test",
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "function": "quizUserApi"
+        }
+      ]
+    },
+    {
+      "target": "prod",
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "function": "prodFunction"
+        }
+      ]
+    }
+  ],
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    }
+  }
+} 

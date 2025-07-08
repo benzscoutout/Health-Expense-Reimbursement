@@ -1,0 +1,33 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "health_expense",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "employeeName",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "submittedDate",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "health_expense",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "submittedDate",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+} 
