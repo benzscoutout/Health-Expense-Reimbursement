@@ -131,6 +131,70 @@ export const claimsAPI = {
     
     return response.json();
   },
+
+  // Flag claim for investigation (HR only)
+  flagClaim: async (claimId: string, reason: string, investigationNotes?: string[]) => {
+    const response = await fetch(`${API_BASE_URL}/claims/${claimId}/flag`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ 
+        reason, 
+        investigationNotes,
+        status: 'Flagged'
+      }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'เกิดข้อผิดพลาดในการทำเครื่องหมาย');
+    }
+    
+    return response.json();
+  },
+
+  // Get fraud analytics (HR only)
+  getFraudAnalytics: async () => {
+    const response = await fetch(`${API_BASE_URL}/claims/fraud-analytics`, {
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
+    }
+    
+    return response.json();
+  },
+
+  // Get flagged claims (HR only)
+  getFlaggedClaims: async () => {
+    const response = await fetch(`${API_BASE_URL}/claims/flagged`, {
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล');
+    }
+    
+    return response.json();
+  },
+
+  // Add investigation notes (HR only)
+  addInvestigationNotes: async (claimId: string, notes: string[]) => {
+    const response = await fetch(`${API_BASE_URL}/claims/${claimId}/investigation-notes`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ notes }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'เกิดข้อผิดพลาดในการเพิ่มบันทึก');
+    }
+    
+    return response.json();
+  },
 };
 
 // Health check

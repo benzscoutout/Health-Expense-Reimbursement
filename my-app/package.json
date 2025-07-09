@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy:test": "vite build && firebase use scoutout-mang-test-e17bf && firebase deploy --only hosting:health-expense-reimbursement-system-test"
+    "deploy:test": "VITE_ENV=production vite build && firebase use scoutout-mang-test-e17bf && firebase deploy --only hosting:health-expense-reimbursement-system-test"
   },
   "dependencies": {
     "@google/genai": "^1.8.0",

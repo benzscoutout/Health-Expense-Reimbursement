@@ -4,11 +4,11 @@ import { extractReceiptData } from '../../services/geminiService';
 import { ArrowUpOnSquareIcon, CameraIcon, SparklesIcon, XMarkIcon } from '../Icons';
 import Spinner from '../Spinner';
 import CameraCapture from '../CameraCapture';
-import { THAI_TEXT } from '../../constants';
 
 interface ClaimFormProps {
   onClaimSubmit: (newClaim: Omit<Claim, 'id' | 'submittedDate' | 'employeeName'>) => void;
   onCancel: () => void;
+  
 }
 
 const ClaimForm: React.FC<ClaimFormProps> = ({ onClaimSubmit, onCancel }) => {
@@ -87,72 +87,87 @@ const ClaimForm: React.FC<ClaimFormProps> = ({ onClaimSubmit, onCancel }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto liquid-glass-card p-8">
-      {showCamera && <CameraCapture onCapture={handleCameraCapture} onCancel={() => setShowCamera(false)} />}
-      <div className="flex justify-between items-start mb-6">
-        <h2 className="text-3xl font-bold text-gray-800">ส่งคำร้องใหม่</h2>
-        <button onClick={onCancel} className="text-gray-500 hover:text-gray-700">
-            <XMarkIcon className="w-7 h-7" />
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left Side: Image Upload & Preview */}
-        <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg h-full liquid-glass-bg">
-            {image ? (
-                <div className="relative w-full">
-                    <img src={image} alt="Receipt Preview" className="rounded-lg max-h-96 w-full object-contain" />
-                     <button onClick={() => {setImage(null); setImageFile(null); setReceiptData({});}} className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1 hover:bg-black/70">
-                         <XMarkIcon className="w-5 h-5"/>
-                     </button>
-                </div>
-            ) : (
-                <div className="text-center">
-                    <h3 className="text-lg font-medium text-gray-700 mb-4">อัปโหลดใบเสร็จของคุณ</h3>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <button onClick={() => fileInputRef.current?.click()} className="btn-primary flex-1 inline-flex items-center justify-center gap-2">
-                           <ArrowUpOnSquareIcon className="w-5 h-5" /> อัปโหลดไฟล์
-                        </button>
-                        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-                        <button onClick={() => setShowCamera(true)} className="btn-primary flex-1 inline-flex items-center justify-center gap-2">
-                            <CameraIcon className="w-5 h-5" /> ใช้กล้อง
-                        </button>
-                    </div>
-                </div>
-            )}
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 animate-fade-in" style={{marginTop: '-10vh'}}>
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-gray-800">ส่งคำร้องใหม่</h2>
+          <button onClick={onCancel} className="text-gray-500 hover:text-gray-700">
+            <XMarkIcon className="w-6 h-6" />
+          </button>
         </div>
 
-        {/* Right Side: Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-            {isLoading && (
-                <div className="flex flex-col items-center justify-center h-full space-y-2 text-gray-700">
-                    <Spinner />
-                    <SparklesIcon className="w-6 h-6 animate-pulse"/>
-                    <p className="font-semibold">AI กำลังวิเคราะห์ใบเสร็จของคุณ...</p>
-                </div>
-            )}
-            {!isLoading && image && (
-                <>
-                <div>
-                    <label htmlFor="vendor" className="block text-sm font-medium text-gray-700">ร้านค้า/สถานพยาบาล</label>
-                    <input type="text" name="vendor" id="vendor" value={receiptData.vendor || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full"/>
-                </div>
-                 <div>
-                    <label htmlFor="date" className="block text-sm font-medium text-gray-700">วันที่</label>
-                    <input type="date" name="date" id="date" value={receiptData.date || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full"/>
-                </div>
-                 <div>
-                    <label htmlFor="total" className="block text-sm font-medium text-gray-700">จำนวนเงินรวม</label>
-                    <input type="number" name="total" id="total" step="0.01" value={receiptData.total || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full"/>
-                </div>
-                {error && <p className="text-sm text-red-600">{error}</p>}
-                <div className="pt-4 flex justify-end gap-4">
-                     <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition">ยกเลิก</button>
-                     <button type="submit" className="btn-primary">ส่งคำร้อง</button>
-                </div>
-                </>
-            )}
-        </form>
+        {/* Content */}
+        <div className="flex-grow overflow-y-auto p-6">
+          {showCamera && <CameraCapture onCapture={handleCameraCapture} onCancel={() => setShowCamera(false)} />}
+          
+          <div className={`grid grid-cols-1 ${image ? 'lg:grid-cols-2' : 'lg:grid-cols-1'} gap-8`}>
+            {/* Left Side: Image Upload & Preview */}
+            <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg h-full liquid-glass-bg">
+                {image ? (
+                    <div className="relative w-full">
+                        <img src={image} alt="Receipt Preview" className="rounded-lg max-h-96 w-full object-contain" />
+                         <button onClick={() => {setImage(null); setImageFile(null); setReceiptData({});}} className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1 hover:bg-black/70">
+                             <XMarkIcon className="w-5 h-5"/>
+                         </button>
+                    </div>
+                ) : (
+                    <div className="text-center">
+                        <h3 className="text-lg font-medium text-gray-700 mb-4">อัปโหลดใบเสร็จของคุณ</h3>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <button onClick={() => fileInputRef.current?.click()} className="btn-primary flex-1 inline-flex items-center justify-center gap-2">
+                               <ArrowUpOnSquareIcon className="w-5 h-5" /> อัปโหลดไฟล์
+                            </button>
+                            <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+                            <button onClick={() => setShowCamera(true)} className="btn-primary flex-1 inline-flex items-center justify-center gap-2">
+                                <CameraIcon className="w-5 h-5" /> ใช้กล้อง
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Right Side: Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+                {isLoading && (
+                    <div className="flex flex-col items-center justify-center h-full space-y-2 text-gray-700">
+                        <Spinner />
+                        <SparklesIcon className="w-6 h-6 animate-pulse"/>
+                        <p className="font-semibold">AI กำลังวิเคราะห์ใบเสร็จของคุณ...</p>
+                    </div>
+                )}
+                {!isLoading && image && (
+                    <>
+                    <div>
+                        <label htmlFor="vendor" className="block text-sm font-medium text-gray-700">ร้านค้า/สถานพยาบาล</label>
+                        <input type="text" name="vendor" id="vendor" value={receiptData.vendor || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full"/>
+                    </div>
+                     <div>
+                        <label htmlFor="date" className="block text-sm font-medium text-gray-700">วันที่</label>
+                        <input type="date" name="date" id="date" value={receiptData.date || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full"/>
+                    </div>
+                     <div>
+                        <label htmlFor="total" className="block text-sm font-medium text-gray-700">จำนวนเงินรวม</label>
+                        <input type="number" name="total" id="total" step="0.01" value={receiptData.total || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full"/>
+                    </div>
+                    {error && <p className="text-sm text-red-600">{error}</p>}
+                    </>
+                )}
+            </form>
+          </div>
+        </div>
+
+        {/* Footer with Action Buttons */}
+        {!isLoading && image && (
+          <div className="p-4 border-t border-gray-200 flex justify-end gap-4">
+            <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition">
+              ยกเลิก
+            </button>
+            <button type="button" onClick={handleSubmit} className="btn-primary">
+              ส่งคำร้อง
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

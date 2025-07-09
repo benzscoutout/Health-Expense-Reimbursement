@@ -7,8 +7,12 @@ interface LoginPageProps {
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ userType }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // Autofill based on userType
+  const defaultEmail = userType === 'hr' ? 'admin@test.com' : 'client@test.com';
+  const defaultPassword = 'password123';
+
+  const [email, setEmail] = useState(defaultEmail);
+  const [password, setPassword] = useState(defaultPassword);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -37,7 +41,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ userType }) => {
       if (userType === 'hr') {
         navigate('/hr');
       } else {
-        navigate('/app');
+        navigate('/app-client');
       }
 
     } catch (error: any) {

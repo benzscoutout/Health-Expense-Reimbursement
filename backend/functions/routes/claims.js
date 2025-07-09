@@ -7,6 +7,153 @@ const os = require('os');
 const path = require('path');
 const fs = require('fs');
 
+// Fraud detection helper functions
+const fraudDetectionService = {
+  // Check for duplicate receipts
+  async checkForDuplicates(employeeName, receiptData, receiptImageUrl) {
+    try {
+      const claimsRef = db.collection('health_expense');
+      const snapshot = await claimsRef
+        .where('employeeName', '==', employeeName)
+        .where('receiptData.vendor', '==', receiptData.vendor)
+        .where('receiptData.total', '==', receiptData.total)
+        .get();
+
+      const duplicates = [];
+      snapshot.forEach(doc => {
+        const claim = doc.data();
+        // Check if same date or very close dates
+        const claimDate = new Date(claim.receiptData.date);
+        const newDate = new Date(receiptData.date);
+        const daysDiff = Math.abs((claimDate - newDate) / (1000 * 60 * 60 * 24));
+        
+        if (daysDiff <= 7) { // Within 7 days
+          duplicates.push({
+            claimId: doc.id,
+            similarityScore: 0.9,
+            reason: 'ร้านค้า จำนวนเงิน และช่วงวันที่เดียวกัน'
+          });
+        }
+      });
+
+      return {
+        isDuplicate: duplicates.length > 0,
+        similarClaims: duplicates
+      };
+    } catch (error) {
+      console.error('Error checking for duplicates:', error);
+      return { isDuplicate: false, similarClaims: [] };
+    }
+  },
+
+  // Validate amount for suspicious patterns
+  validateAmount(amount, vendor) {
+    const fraudIndicators = [];
+    
+    // Check for round numbers (suspicious)
+    if (amount % 1000 === 0 && amount > 1000) {
+      fraudIndicators.push({
+        type: 'suspicious_pattern',
+        severity: 'medium',
+        description: 'จำนวนเงินกลมอาจน่าสงสัย',
+        confidence: 0.7,
+        detectedAt: new Date().toISOString()
+      });
+    }
+
+    // Check for unusually high amounts
+    if (amount > 50000) {
+      fraudIndicators.push({
+        type: 'unusual_amount',
+        severity: 'high',
+        description: 'จำนวนเงินเกินขีดจำกัดค่าใช้จ่ายด้านสุขภาพทั่วไป',
+        confidence: 0.8,
+        detectedAt: new Date().toISOString()
+      });
+    }
+
+    // Check for very small amounts (might be fake)
+    if (amount < 100) {
+      fraudIndicators.push({
+        type: 'suspicious_pattern',
+        severity: 'low',
+        description: 'จำนวนเงินน้อยมากอาจน่าสงสัย',
+        confidence: 0.5,
+        detectedAt: new Date().toISOString()
+      });
+    }
+
+    return fraudIndicators;
+  },
+
+  // Validate date for anomalies
+  validateDate(date) {
+    const fraudIndicators = [];
+    const claimDate = new Date(date);
+    const today = new Date();
+    
+    // Check for future dates
+    if (claimDate > today) {
+      fraudIndicators.push({
+        type: 'date_anomaly',
+        severity: 'high',
+        description: 'วันที่ใบเสร็จอยู่ในอนาคต',
+        confidence: 0.9,
+        detectedAt: new Date().toISOString()
+      });
+    }
+
+    // Check for very old dates (more than 1 year)
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    if (claimDate < oneYearAgo) {
+      fraudIndicators.push({
+        type: 'date_anomaly',
+        severity: 'medium',
+        description: 'วันที่ใบเสร็จเก่าเกินไป',
+        confidence: 0.7,
+        detectedAt: new Date().toISOString()
+      });
+    }
+
+    return fraudIndicators;
+  },
+
+  // Calculate overall fraud risk level
+  calculateRiskLevel(fraudIndicators) {
+    if (!fraudIndicators || fraudIndicators.length === 0) {
+      return 'low';
+    }
+
+    const highSeverityCount = fraudIndicators.filter(i => i.severity === 'high').length;
+    const mediumSeverityCount = fraudIndicators.filter(i => i.severity === 'medium').length;
+
+    if (highSeverityCount > 0) return 'high';
+    if (mediumSeverityCount > 1) return 'high';
+    if (mediumSeverityCount > 0) return 'medium';
+    return 'low';
+  },
+
+  // Calculate authenticity score
+  calculateAuthenticityScore(fraudIndicators) {
+    if (!fraudIndicators || fraudIndicators.length === 0) {
+      return 1.0;
+    }
+
+    let totalPenalty = 0;
+    fraudIndicators.forEach(indicator => {
+      const severityMultiplier = {
+        'low': 0.1,
+        'medium': 0.3,
+        'high': 0.5
+      };
+      totalPenalty += indicator.confidence * severityMultiplier[indicator.severity];
+    });
+
+    return Math.max(0, 1 - totalPenalty);
+  }
+};
+
 // Test route to check if claims router is working (no auth required)
 router.get('/test', (req, res) => {
   res.json({ message: 'Claims router is working' });
@@ -30,8 +177,6 @@ router.get('/debug-auth', (req, res) => {
     headers: req.headers
   });
 });
-
-
 
 // Get all claims (HR only)
 router.get('/', authHR, async (req, res) => {
@@ -98,10 +243,10 @@ router.get('/my-claims', auth, async (req, res) => {
   }
 });
 
-// Submit new claim
+// Submit new claim with fraud detection
 router.post('/', auth, async (req, res) => {
   try {
-    console.log('Starting file upload with raw body parsing');
+    console.log('Starting file upload with fraud detection');
     console.log('Request headers:', req.headers);
     console.log('Content-Type:', req.headers['content-type']);
 
@@ -204,18 +349,63 @@ router.post('/', auth, async (req, res) => {
           // Clean up temporary file
           fs.unlinkSync(fileToProcess.filepath);
 
+          // Prepare receipt data
+          const receiptData = {
+            vendor,
+            date,
+            total: parseFloat(total),
+            items: items ? JSON.parse(items) : []
+          };
+
+          // Perform fraud detection
+          console.log('Performing fraud detection...');
+          
+          // Check for duplicates
+          const duplicateCheck = await fraudDetectionService.checkForDuplicates(
+            req.user.email, 
+            receiptData, 
+            publicUrl
+          );
+
+          // Validate amount
+          const amountFraudIndicators = fraudDetectionService.validateAmount(
+            receiptData.total, 
+            receiptData.vendor
+          );
+
+          // Validate date
+          const dateFraudIndicators = fraudDetectionService.validateDate(receiptData.date);
+
+          // Combine all fraud indicators
+          const allFraudIndicators = [
+            ...amountFraudIndicators,
+            ...dateFraudIndicators
+          ];
+
+          // Calculate risk level and authenticity score
+          const fraudRiskLevel = fraudDetectionService.calculateRiskLevel(allFraudIndicators);
+          const authenticityScore = fraudDetectionService.calculateAuthenticityScore(allFraudIndicators);
+
+          // Determine initial status based on fraud detection
+          let initialStatus = 'Pending';
+          if (fraudRiskLevel === 'high') {
+            initialStatus = 'Flagged';
+          } else if (fraudRiskLevel === 'medium') {
+            initialStatus = 'UnderReview';
+          }
+
           const claimData = {
             employeeName: req.user.email,
             submittedDate: new Date().toISOString().split('T')[0],
             receiptImage: publicUrl,
-            receiptData: {
-              vendor,
-              date,
-              total: parseFloat(total),
-              items: items ? JSON.parse(items) : []
-            },
-            status: 'Pending',
-            createdAt: new Date()
+            receiptData,
+            status: initialStatus,
+            createdAt: new Date(),
+            // Fraud detection data
+            fraudIndicators: allFraudIndicators,
+            authenticityScore,
+            fraudRiskLevel,
+            duplicateCheck
           };
 
           const docRef = await db.collection('health_expense').add(claimData);
@@ -226,6 +416,12 @@ router.post('/', auth, async (req, res) => {
             claim: {
               id: docRef.id,
               ...claimData
+            },
+            fraudDetection: {
+              riskLevel: fraudRiskLevel,
+              authenticityScore,
+              indicators: allFraudIndicators.length,
+              isDuplicate: duplicateCheck.isDuplicate
             }
           });
 
@@ -297,13 +493,13 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// Update claim status (HR only)
+// Update claim status (HR only) with fraud handling
 router.patch('/:claimId', authHR, async (req, res) => {
   try {
     const { claimId } = req.params;
-    const { status, feedback } = req.body;
+    const { status, feedback, investigationNotes } = req.body;
 
-    if (!status || !['Pending', 'Approved', 'Rejected'].includes(status)) {
+    if (!status || !['Pending', 'Approved', 'Rejected', 'Flagged', 'UnderReview'].includes(status)) {
       return res.status(400).json({ message: 'สถานะไม่ถูกต้อง' });
     }
 
@@ -321,6 +517,16 @@ router.patch('/:claimId', authHR, async (req, res) => {
 
     if (feedback) {
       updateData.feedback = feedback;
+    }
+
+    // Handle fraud-related updates
+    if (status === 'Flagged') {
+      updateData.flaggedBy = req.user.email;
+      updateData.flaggedAt = new Date().toISOString();
+    }
+
+    if (investigationNotes) {
+      updateData.investigationNotes = investigationNotes;
     }
 
     await claimRef.update(updateData);

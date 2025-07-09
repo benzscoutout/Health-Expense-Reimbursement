@@ -32,11 +32,11 @@ npm run dev
 ### Test Users
 - **HR Login:**
   - Email: `admin@test.com`
-  - Password: `password`
+  - Password: `password123`
 
 - **Client Login:**
   - Email: `client@test.com`
-  - Password: `password`
+  - Password: `password123`
 
 ## 📁 Project Structure
 
