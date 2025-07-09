@@ -52,6 +52,10 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(236, 6, 141, 0.3);
+  min-height: 44px; /* Touch target minimum */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-primary::before {
@@ -72,6 +76,15 @@
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(236, 6, 141, 0.4);
+}
+
+/* Mobile responsive button adjustments */
+@media (max-width: 640px) {
+  .btn-primary {
+    padding: 12px 16px;
+    font-size: 14px;
+    min-height: 48px; /* Larger touch target on mobile */
+  }
 }
 
 /* Header with Liquid Glass */
@@ -110,12 +123,22 @@
   padding: 12px 16px;
   color: var(--text-color);
   transition: all 0.3s ease;
+  min-height: 44px; /* Touch target minimum */
+  font-size: 16px; /* Prevent zoom on iOS */
 }
 
 .liquid-glass-input:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(236, 6, 141, 0.1);
+}
+
+/* Mobile responsive input adjustments */
+@media (max-width: 640px) {
+  .liquid-glass-input {
+    min-height: 48px; /* Larger touch target on mobile */
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
 }
 
 /* Toggle Switch with Liquid Glass */
@@ -161,4 +184,27 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary-hover);
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  /* Ensure modals don't overflow on mobile */
+  .modal-content {
+    max-width: 95vw !important;
+    margin: 1rem !important;
+  }
+  
+  /* Improve touch targets */
+  button, input, select, textarea {
+    min-height: 44px;
+  }
+  
+  /* Better spacing for mobile */
+  .space-y-4 > * + * {
+    margin-top: 1rem;
+  }
+  
+  .space-y-6 > * + * {
+    margin-top: 1.5rem;
+  }
 } 

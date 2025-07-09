@@ -87,39 +87,39 @@ const ClaimForm: React.FC<ClaimFormProps> = ({ onClaimSubmit, onCancel }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 animate-fade-in" style={{marginTop: '-10vh'}}>
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-2 sm:p-4 z-50 animate-fade-in" style={{marginTop: '-10vh'}}>
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl sm:max-w-2xl lg:max-w-6xl max-h-[90vh] flex flex-col mt-6" onClick={e => e.stopPropagation()}>
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-800">ส่งคำร้องใหม่</h2>
-          <button onClick={onCancel} className="text-gray-500 hover:text-gray-700">
-            <XMarkIcon className="w-6 h-6" />
+        <div className="p-3 sm:p-4 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-lg sm:text-2xl font-bold text-gray-800">ส่งคำร้องใหม่</h2>
+          <button onClick={onCancel} className="text-gray-500 hover:text-gray-700 p-1">
+            <XMarkIcon className="w-5 h-6 sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-grow overflow-y-auto p-6">
+        <div className="flex-grow overflow-y-auto p-3 sm:p-6">
           {showCamera && <CameraCapture onCapture={handleCameraCapture} onCancel={() => setShowCamera(false)} />}
           
-          <div className={`grid grid-cols-1 ${image ? 'lg:grid-cols-2' : 'lg:grid-cols-1'} gap-8`}>
+          <div className={`grid grid-cols-1 ${image ? 'lg:grid-cols-2' : 'lg:grid-cols-1'} gap-4 sm:gap-8`}>
             {/* Left Side: Image Upload & Preview */}
-            <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg h-full liquid-glass-bg">
+            <div className="flex flex-col items-center justify-center p-3 sm:p-6 border-2 border-dashed border-gray-300 rounded-lg h-full liquid-glass-bg">
                 {image ? (
                     <div className="relative w-full">
-                        <img src={image} alt="Receipt Preview" className="rounded-lg max-h-96 w-full object-contain" />
+                        <img src={image} alt="Receipt Preview" className="rounded-lg max-h-64 sm:max-h-96 w-full object-contain" />
                          <button onClick={() => {setImage(null); setImageFile(null); setReceiptData({});}} className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1 hover:bg-black/70">
-                             <XMarkIcon className="w-5 h-5"/>
+                             <XMarkIcon className="w-4 h-4 sm:w-5 sm:h-5"/>
                          </button>
                     </div>
                 ) : (
                     <div className="text-center">
-                        <h3 className="text-lg font-medium text-gray-700 mb-4">อัปโหลดใบเสร็จของคุณ</h3>
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <button onClick={() => fileInputRef.current?.click()} className="btn-primary flex-1 inline-flex items-center justify-center gap-2">
+                        <h3 className="text-base sm:text-lg font-medium text-gray-700 mb-4">อัปโหลดใบเสร็จของคุณ</h3>
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                            <button onClick={() => fileInputRef.current?.click()} className="btn-primary flex-1 inline-flex items-center justify-center gap-2 h-12 text-base">
                                <ArrowUpOnSquareIcon className="w-5 h-5" /> อัปโหลดไฟล์
                             </button>
                             <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-                            <button onClick={() => setShowCamera(true)} className="btn-primary flex-1 inline-flex items-center justify-center gap-2">
+                            <button onClick={() => setShowCamera(true)} className="btn-primary flex-1 inline-flex items-center justify-center gap-2 h-12 text-base">
                                 <CameraIcon className="w-5 h-5" /> ใช้กล้อง
                             </button>
                         </div>
@@ -128,27 +128,27 @@ const ClaimForm: React.FC<ClaimFormProps> = ({ onClaimSubmit, onCancel }) => {
             </div>
 
             {/* Right Side: Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                 {isLoading && (
                     <div className="flex flex-col items-center justify-center h-full space-y-2 text-gray-700">
                         <Spinner />
                         <SparklesIcon className="w-6 h-6 animate-pulse"/>
-                        <p className="font-semibold">AI กำลังวิเคราะห์ใบเสร็จของคุณ...</p>
+                        <p className="font-semibold text-sm sm:text-base">AI กำลังวิเคราะห์ใบเสร็จของคุณ...</p>
                     </div>
                 )}
                 {!isLoading && image && (
                     <>
                     <div>
                         <label htmlFor="vendor" className="block text-sm font-medium text-gray-700">ร้านค้า/สถานพยาบาล</label>
-                        <input type="text" name="vendor" id="vendor" value={receiptData.vendor || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full"/>
+                        <input type="text" name="vendor" id="vendor" value={receiptData.vendor || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full h-12 text-base"/>
                     </div>
                      <div>
                         <label htmlFor="date" className="block text-sm font-medium text-gray-700">วันที่</label>
-                        <input type="date" name="date" id="date" value={receiptData.date || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full"/>
+                        <input type="date" name="date" id="date" value={receiptData.date || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full h-12 text-base"/>
                     </div>
                      <div>
                         <label htmlFor="total" className="block text-sm font-medium text-gray-700">จำนวนเงินรวม</label>
-                        <input type="number" name="total" id="total" step="0.01" value={receiptData.total || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full"/>
+                        <input type="number" name="total" id="total" step="0.01" value={receiptData.total || ''} onChange={handleFormChange} className="liquid-glass-input mt-1 block w-full h-12 text-base"/>
                     </div>
                     {error && <p className="text-sm text-red-600">{error}</p>}
                     </>
@@ -159,11 +159,11 @@ const ClaimForm: React.FC<ClaimFormProps> = ({ onClaimSubmit, onCancel }) => {
 
         {/* Footer with Action Buttons */}
         {!isLoading && image && (
-          <div className="p-4 border-t border-gray-200 flex justify-end gap-4">
-            <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition">
+          <div className="p-3 sm:p-4 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
+            <button type="button" onClick={onCancel} className="px-4 py-3 sm:py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition h-12 text-base">
               ยกเลิก
             </button>
-            <button type="button" onClick={handleSubmit} className="btn-primary">
+            <button type="button" onClick={handleSubmit} className="btn-primary h-12 text-base">
               ส่งคำร้อง
             </button>
           </div>

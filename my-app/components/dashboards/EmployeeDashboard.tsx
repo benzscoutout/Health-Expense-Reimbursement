@@ -96,17 +96,17 @@ const ClaimDetailModal: React.FC<{ claim: Claim; onClose: () => void }> = ({ cla
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 animate-fade-in" style={{marginTop: '-10vh'}}>
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
-          <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-            <h3 className="text-xl font-bold text-gray-800">รายละเอียดคำร้อง: {claim.id}</h3>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">&times;</button>
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-2 sm:p-4 z-50 animate-fade-in" style={{marginTop: '-10vh'}}>
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-xl sm:max-w-2xl lg:max-w-4xl max-h-[90vh] flex flex-col mt-6" onClick={e => e.stopPropagation()}>
+          <div className="p-3 sm:p-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800">รายละเอียดคำร้อง: {claim.id}</h3>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700 p-1">&times;</button>
           </div>
-          <div className="flex-grow overflow-y-auto p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="flex-grow overflow-y-auto p-3 sm:p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Receipt Image */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-lg text-gray-800">รูปใบเสร็จ</h4>
+              <div className="space-y-3 sm:space-y-4">
+                <h4 className="font-semibold text-base sm:text-lg text-gray-800">รูปใบเสร็จ</h4>
                 <img
                   src={typeof claim.receiptImage === 'string' ? claim.receiptImage : ''}
                   alt="Receipt"
@@ -116,15 +116,15 @@ const ClaimDetailModal: React.FC<{ claim: Claim; onClose: () => void }> = ({ cla
               </div>
               
               {/* Claim Details */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-lg text-gray-800">ข้อมูลเกี่ยวกับใบเบิกจ่าย</h4>
-                <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-                  <p className="text-gray-800"><strong>ร้านค้า:</strong> {claim.receiptData.vendor}</p>
-                  <p className="text-gray-800"><strong>วันที่:</strong> {claim.receiptData.date}</p>
-                  <p className="text-gray-800"><strong>รวม:</strong> <span className="font-bold text-xl">{formatCurrency(claim.receiptData.total)}</span></p>
-                  <div className="text-gray-800">
+              <div className="space-y-3 sm:space-y-4">
+                <h4 className="font-semibold text-base sm:text-lg text-gray-800">ข้อมูลเกี่ยวกับใบเบิกจ่าย</h4>
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg space-y-2 sm:space-y-3">
+                  <p className="text-gray-800 text-sm sm:text-base"><strong>ร้านค้า:</strong> {claim.receiptData.vendor}</p>
+                  <p className="text-gray-800 text-sm sm:text-base"><strong>วันที่:</strong> {claim.receiptData.date}</p>
+                  <p className="text-gray-800 text-sm sm:text-base"><strong>รวม:</strong> <span className="font-bold text-lg sm:text-xl">{formatCurrency(claim.receiptData.total)}</span></p>
+                  <div className="text-gray-800 text-sm sm:text-base">
                     <strong>รายการ:</strong>
-                    <ul className="list-disc pl-5 mt-1 text-sm">
+                    <ul className="list-disc pl-5 mt-1 text-xs sm:text-sm">
                       {claim.receiptData.items.map((item, index) => <li key={index}>{item.description}: {formatCurrency(item.amount)}</li>)}
                     </ul>
                   </div>
@@ -132,22 +132,22 @@ const ClaimDetailModal: React.FC<{ claim: Claim; onClose: () => void }> = ({ cla
 
                 {/* Fraud Detection Section - Only show if there are indicators */}
                 {claim.fraudIndicators && claim.fraudIndicators.length > 0 && (
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-lg text-orange-800 flex items-center gap-2">
-                      <ExclamationTriangleIcon className="w-5 h-5" />
+                  <div className="space-y-3 sm:space-y-4">
+                    <h4 className="font-semibold text-base sm:text-lg text-orange-800 flex items-center gap-2">
+                      <ExclamationTriangleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                       แจ้งเตือนการตรวจพบความเสี่ยง
                     </h4>
-                    <div className="bg-orange-50 p-4 rounded-lg space-y-3">
-                      <p className="text-sm text-orange-800">
+                    <div className="bg-orange-50 p-3 sm:p-4 rounded-lg space-y-2 sm:space-y-3">
+                      <p className="text-xs sm:text-sm text-orange-800">
                         ระบบของเราตรวจพบปัญหาที่อาจเกิดขึ้นกับใบเสร็จนี้ นี่ไม่ได้หมายความว่าคำร้องของคุณจะถูกปฏิเสธ แต่อาจต้องมีการตรวจสอบเพิ่มเติม
                       </p>
                       <div className="space-y-2">
                         {claim.fraudIndicators.map((indicator, index) => (
                           <div key={index} className="border-l-4 border-orange-400 pl-3">
-                            <p className="text-sm font-medium text-orange-700">
+                            <p className="text-xs sm:text-sm font-medium text-orange-700">
                               {indicator.type.replace('_', ' ').toUpperCase()} ({indicator.severity})
                             </p>
-                            <p className="text-sm text-gray-700">{indicator.description}</p>
+                            <p className="text-xs sm:text-sm text-gray-700">{indicator.description}</p>
                           </div>
                         ))}
                       </div>
@@ -157,13 +157,13 @@ const ClaimDetailModal: React.FC<{ claim: Claim; onClose: () => void }> = ({ cla
 
                 {/* Duplicate Check */}
                 {claim.duplicateCheck?.isDuplicate && (
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-lg text-blue-800 flex items-center gap-2">
-                      <ShieldExclamationIcon className="w-5 h-5" />
+                  <div className="space-y-3 sm:space-y-4">
+                    <h4 className="font-semibold text-base sm:text-lg text-blue-800 flex items-center gap-2">
+                      <ShieldExclamationIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                       ตรวจพบคำร้องที่คล้ายคลึง
                     </h4>
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <p className="text-sm text-blue-800">
+                    <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                      <p className="text-xs sm:text-sm text-blue-800">
                         ระบบของเราพบคำร้องที่คล้ายคลึงจากบัญชีของคุณ นี่เป็นเรื่องปกติหากคุณส่งคำร้องหลายรายการสำหรับบริการเดียวกัน
                       </p>
                     </div>
@@ -173,8 +173,8 @@ const ClaimDetailModal: React.FC<{ claim: Claim; onClose: () => void }> = ({ cla
                 {/* Authenticity Score */}
                 {claim.authenticityScore !== undefined && (
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-lg text-gray-800">การวิเคราะห์ใบเสร็จ</h4>
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="font-semibold text-base sm:text-lg text-gray-800">การวิเคราะห์ใบเสร็จ</h4>
+                    <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
                       <AuthenticityScore score={claim.authenticityScore} />
                       <FraudRiskBadge riskLevel={claim.fraudRiskLevel} />
                     </div>
@@ -182,17 +182,17 @@ const ClaimDetailModal: React.FC<{ claim: Claim; onClose: () => void }> = ({ cla
                 )}
 
                 {/* Status and Feedback */}
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-lg text-gray-800">สถานะคำร้อง</h4>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                <div className="space-y-3 sm:space-y-4">
+                  <h4 className="font-semibold text-base sm:text-lg text-gray-800">สถานะคำร้อง</h4>
+                  <div className="bg-gray-50 p-3 sm:p-4 rounded-lg space-y-2 sm:space-y-3">
                     <div className="flex items-center gap-2">
                       <StatusBadge status={claim.status} />
                       <FraudRiskBadge riskLevel={claim.fraudRiskLevel} />
                     </div>
                     {claim.feedback && (
                       <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                        <p className="text-sm font-medium text-blue-800">ความคิดเห็นจากฝ่ายบุคคล:</p>
-                        <p className="text-sm text-blue-700 mt-1">"{claim.feedback}"</p>
+                        <p className="text-xs sm:text-sm font-medium text-blue-800">ความคิดเห็นจากฝ่ายบุคคล:</p>
+                        <p className="text-xs sm:text-sm text-blue-700 mt-1">"{claim.feedback}"</p>
                       </div>
                     )}
                   </div>
@@ -203,7 +203,7 @@ const ClaimDetailModal: React.FC<{ claim: Claim; onClose: () => void }> = ({ cla
         </div>
       </div>
       {showImageModal && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"  onClick={() => setShowImageModal(false)}>
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-2 sm:p-4" onClick={() => setShowImageModal(false)}>
           <img
             src={typeof claim.receiptImage === 'string' ? claim.receiptImage : ''}
             alt="Receipt Large View"
@@ -212,7 +212,7 @@ const ClaimDetailModal: React.FC<{ claim: Claim; onClose: () => void }> = ({ cla
           />
           <button
             onClick={() => setShowImageModal(false)}
-            className="absolute top-6 right-6 bg-black/60 text-white rounded-full p-2 hover:bg-black/80 z-10"
+            className="absolute top-4 sm:top-6 right-4 sm:right-6 bg-black/60 text-white rounded-full p-2 hover:bg-black/80 z-10"
           >
             &times;
           </button>
@@ -249,43 +249,43 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ claims, addClaim 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">แดชบอร์ดพนักงาน</h1>
-          <p className="text-gray-600">จัดการคำร้องค่าใช้จ่ายด้านสุขภาพของคุณ</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">แดชบอร์ดพนักงาน</h1>
+          <p className="text-sm sm:text-base text-gray-600">จัดการคำร้องค่าใช้จ่ายด้านสุขภาพของคุณ</p>
         </div>
         <button
           onClick={() => setShowClaimForm(true)}
-          className="btn-primary flex items-center gap-2"
+          className="btn-primary flex items-center gap-2 h-10 sm:h-auto text-sm sm:text-base"
         >
-          <PlusIcon className="w-5 h-5" />
+          <PlusIcon className="w-4 h-4 sm:w-5 sm:h-5" />
           ส่งคำร้องใหม่
         </button>
       </div>
 
       {/* Status Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
-          <p className="text-sm text-gray-600">ทั้งหมด</p>
-          <p className="text-2xl font-bold text-gray-900">{claims.length}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border">
+          <p className="text-xs sm:text-sm text-gray-600">ทั้งหมด</p>
+          <p className="text-lg sm:text-2xl font-bold text-gray-900">{claims.length}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
-          <p className="text-sm text-gray-600">รอดำเนินการ</p>
-          <p className="text-2xl font-bold text-yellow-600">{statusCounts.Pending}</p>
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border">
+          <p className="text-xs sm:text-sm text-gray-600">รอดำเนินการ</p>
+          <p className="text-lg sm:text-2xl font-bold text-yellow-600">{statusCounts.Pending}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
-          <p className="text-sm text-gray-600">อนุมัติ</p>
-          <p className="text-2xl font-bold text-green-600">{statusCounts.Approved}</p>
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border">
+          <p className="text-xs sm:text-sm text-gray-600">อนุมัติ</p>
+          <p className="text-lg sm:text-2xl font-bold text-green-600">{statusCounts.Approved}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
-          <p className="text-sm text-gray-600">ปฏิเสธ</p>
-          <p className="text-2xl font-bold text-red-600">{statusCounts.Rejected}</p>
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border">
+          <p className="text-xs sm:text-sm text-gray-600">ปฏิเสธ</p>
+          <p className="text-lg sm:text-2xl font-bold text-red-600">{statusCounts.Rejected}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
-          <p className="text-sm text-gray-600">ตรวจสอบ</p>
-          <p className="text-2xl font-bold text-orange-600">{statusCounts.Flagged + statusCounts.UnderReview}</p>
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border col-span-2 sm:col-span-1">
+          <p className="text-xs sm:text-sm text-gray-600">ตรวจสอบ</p>
+          <p className="text-lg sm:text-2xl font-bold text-orange-600">{statusCounts.Flagged + statusCounts.UnderReview}</p>
         </div>
       </div>
 
@@ -293,13 +293,15 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ claims, addClaim 
       <div className="liquid-glass-card overflow-hidden">
         <ul className="divide-y divide-gray-200">
           {claims.length > 0 ? claims.map(claim => (
-            <li key={claim.id} className="p-4 hover:bg-gray-50 transition-colors duration-150">
-              <div className="flex flex-wrap items-center justify-between gap-4">
+            <li key={claim.id} className="p-3 sm:p-4 hover:bg-gray-50 transition-colors duration-150">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                     <p className="text-sm font-semibold text-gray-800 truncate">{claim.receiptData.vendor}</p>
-                    <StatusBadge status={claim.status} />
-                    <FraudRiskBadge riskLevel={claim.fraudRiskLevel} />
+                    <div className="flex flex-wrap gap-1 sm:gap-2">
+                      <StatusBadge status={claim.status} />
+                      <FraudRiskBadge riskLevel={claim.fraudRiskLevel} />
+                    </div>
                   </div>
                   <p className="text-xs text-gray-500">ส่งเมื่อ: {claim.submittedDate}</p>
                   {claim.fraudIndicators && claim.fraudIndicators.length > 0 && (
@@ -308,14 +310,14 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ claims, addClaim 
                     </p>
                   )}
                 </div>
-                <div className="flex items-center gap-4">
-                  <p className="text-lg font-bold text-gray-800">{formatCurrency(claim.receiptData.total)}</p>
+                <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4">
+                  <p className="text-base sm:text-lg font-bold text-gray-800">{formatCurrency(claim.receiptData.total)}</p>
                   <button
                     onClick={() => setSelectedClaim(claim)}
-                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs sm:text-sm h-8 sm:h-auto px-2 sm:px-0"
                   >
-                    <EyeIcon className="w-4 h-4" />
-                    ดู
+                    <EyeIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="sm:inline">ดู</span>
                   </button>
                 </div>
               </div>
@@ -327,7 +329,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ claims, addClaim 
               )}
             </li>
           )) : (
-            <li className="p-8 text-center text-gray-500">
+            <li className="p-6 sm:p-8 text-center text-gray-500">
               คุณยังไม่มีคำร้องใดๆ
             </li>
           )}
