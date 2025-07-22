@@ -6,6 +6,7 @@ import TopNavigation from './TopNavigation';
 import SearchFilters from './SearchFilters';
 import ExpenseList from './ExpenseList';
 import AnalyticsDashboard from './AnalyticsDashboard';
+import EmployeeManagement from './EmployeeManagement';
 import { claimsAPI } from '../services/api';
 
 const HRDashboard: React.FC = () => {
@@ -21,10 +22,11 @@ const HRDashboard: React.FC = () => {
   const getActiveTab = () => {
     if (location.pathname.includes('/expenses')) return 'expenses';
     if (location.pathname.includes('/analytics')) return 'analytics';
+    if (location.pathname.includes('/employees')) return 'employees';
     return 'analytics'; // default to analytics
   };
 
-  const [activeTab, setActiveTab] = useState<'analytics' | 'expenses'>(getActiveTab());
+  const [activeTab, setActiveTab] = useState<'analytics' | 'expenses' | 'employees'>(getActiveTab());
 
   // Update active tab when URL changes
   useEffect(() => {
@@ -59,13 +61,15 @@ const HRDashboard: React.FC = () => {
     }
   }, []);
 
-  const handleTabChange = (tab: 'analytics' | 'expenses') => {
+  const handleTabChange = (tab: 'analytics' | 'expenses' | 'employees') => {
     setActiveTab(tab);
     // Update URL based on tab
     if (tab === 'analytics') {
       navigate('/hr/analytics', { replace: true });
-    } else {
+    } else if (tab === 'expenses') {
       navigate('/hr/expenses', { replace: true });
+    } else if (tab === 'employees') {
+      navigate('/hr/employees', { replace: true });
     }
   };
 
@@ -100,6 +104,10 @@ const HRDashboard: React.FC = () => {
 
   const handleMobileSidebarToggle = () => {
     setSidebarOpen(!sidebarOpen);
+    // On mobile, when opening sidebar, ensure it's not collapsed
+    if (!sidebarOpen) {
+      setSidebarCollapsed(false);
+    }
   };
 
   if (loading) {
@@ -131,6 +139,14 @@ const HRDashboard: React.FC = () => {
 
   return (
     <div className="dashboard-layout">
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={handleMobileSidebarToggle}
+        />
+      )}
+
       {/* Sidebar */}
       <Sidebar 
         activeTab={activeTab}
@@ -139,14 +155,17 @@ const HRDashboard: React.FC = () => {
         isCollapsed={sidebarCollapsed}
         onToggleCollapse={handleSidebarToggle}
         isMobileOpen={sidebarOpen}
+        onMobileClose={handleMobileSidebarToggle}
       />
 
       {/* Main Content */}
-      <main className="main-content">
+      <main className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         {/* Top Navigation */}
         <TopNavigation 
           activeTab={activeTab}
           onCreateNewClaim={handleCreateNewClaim}
+          onMobileSidebarToggle={handleMobileSidebarToggle}
+          isMobileSidebarOpen={sidebarOpen}
         />
 
         {/* Page Header */}
@@ -176,8 +195,12 @@ const HRDashboard: React.FC = () => {
         <div className="p-6">
           {activeTab === 'analytics' ? (
             <AnalyticsDashboard claims={claims} />
-          ) : (
+          ) : activeTab === 'expenses' ? (
             <ExpenseList claims={claims} updateClaim={updateClaim} />
+          ) : activeTab === 'employees' ? (
+            <EmployeeManagement onTabChange={handleTabChange} />
+          ) : (
+            <AnalyticsDashboard claims={claims} />
           )}
         </div>
       </main>

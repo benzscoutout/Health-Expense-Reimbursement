@@ -11,12 +11,13 @@ import {
 } from './Icons';
 
 interface SidebarProps {
-  activeTab?: 'analytics' | 'expenses';
-  onTabChange?: (tab: 'analytics' | 'expenses') => void;
+  activeTab?: 'analytics' | 'expenses' | 'employees';
+  onTabChange?: (tab: 'analytics' | 'expenses' | 'employees') => void;
   onLogout?: () => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
   isMobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -25,9 +26,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   onLogout,
   isCollapsed = false,
   onToggleCollapse,
-  isMobileOpen = false
+  isMobileOpen = false,
+  onMobileClose
 }) => {
-  const handleTabClick = (tab: 'analytics' | 'expenses') => {
+  const handleTabClick = (tab: 'analytics' | 'expenses' | 'employees') => {
     if (onTabChange) {
       onTabChange(tab);
     }
@@ -45,6 +47,12 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
+  const handleMobileClose = () => {
+    if (onMobileClose) {
+      onMobileClose();
+    }
+  };
+
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobileOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
@@ -53,13 +61,25 @@ const Sidebar: React.FC<SidebarProps> = ({
             <h2 className="text-xl font-bold text-primary">Health Expense</h2>
             <p className="text-sm text-secondary">Management System</p>
           </div>
-          <button 
-            onClick={handleToggleCollapse}
-            className="sidebar-toggle-btn"
-            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {isCollapsed ? <Bars3Icon className="w-5 h-5" /> : <XMarkIcon className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Desktop collapse/expand button - only show on md and above */}
+            <button 
+              onClick={handleToggleCollapse}
+              className="sidebar-toggle-btn hidden md:flex"
+              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {isCollapsed ? <Bars3Icon className="w-5 h-5" /> : <XMarkIcon className="w-5 h-5" />}
+            </button>
+            
+            {/* Mobile close button - only show on mobile */}
+            <button 
+              onClick={handleMobileClose}
+              className="sidebar-toggle-btn flex md:hidden"
+              aria-label="Close sidebar"
+            >
+              <XMarkIcon className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
       
@@ -84,7 +104,8 @@ const Sidebar: React.FC<SidebarProps> = ({
         </a>
         <a 
           href="#" 
-          className="sidebar-nav-item"
+          className={`sidebar-nav-item ${activeTab === 'employees' ? 'active' : ''}`}
+          onClick={() => handleTabClick('employees')}
           title={isCollapsed ? 'จัดการพนักงาน' : undefined}
         >
           <UserGroupIcon className="sidebar-nav-icon" />

@@ -41,7 +41,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ userType }) => {
       if (userType === 'hr') {
         navigate('/hr');
       } else {
-        navigate('/app-client');
+        navigate('/employee');
       }
 
     } catch (error: any) {
@@ -70,11 +70,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ userType }) => {
   };
 
   return (
-    <div className="min-h-screen gradient-bg text-black font-sans flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 lg:p-8 w-full max-w-sm sm:max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-xl p-4 sm:p-6 lg:p-8 w-full max-w-sm sm:max-w-md">
         <div className="text-center mb-6 sm:mb-8">
+          <div className="w-12 h-12 bg-gradient-to-br from-[#ec068d] to-[#d1057a] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-white font-bold text-lg">H</span>
+          </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-            ระบบเบิกจ่ายค่าใช้จ่ายด้านสุขภาพ
+            Health Expense
           </h1>
           <p className="text-sm sm:text-base text-gray-600">{getTitle()}</p>
         </div>
@@ -90,7 +93,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ userType }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={getDefaultEmail()}
-              className="w-full p-3 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-12 text-base"
+              className="w-full p-3 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ec068d] focus:border-transparent h-12 text-base transition-all duration-200"
               required
             />
           </div>
@@ -105,7 +108,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ userType }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
-              className="w-full p-3 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-12 text-base"
+              className="w-full p-3 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ec068d] focus:border-transparent h-12 text-base transition-all duration-200"
               required
             />
           </div>
@@ -119,7 +122,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ userType }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-3 sm:py-3 rounded-lg font-semibold text-base hover:bg-blue-700 transition-colors duration-200 h-12 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#ec068d] text-white py-3 sm:py-3 rounded-lg font-semibold text-base hover:bg-[#d1057a] transition-all duration-200 h-12 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             {isLoading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
           </button>
@@ -128,19 +131,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ userType }) => {
         <div className="mt-6 text-center">
           <button
             onClick={() => navigate('/')}
-            className="text-blue-600 hover:text-blue-800 text-sm"
+            className="text-[#ec068d] hover:text-[#d1057a] text-sm transition-colors duration-200"
           >
             ← กลับไปหน้าหลัก
           </button>
         </div>
 
-                  <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">ข้อมูลสำหรับทดสอบ:</h3>
-            <div className="text-sm text-gray-600 space-y-1">
-              <p><strong>อีเมล:</strong> {getDefaultEmail()}</p>
-              <p><strong>รหัสผ่าน:</strong> password123</p>
-            </div>
+        <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <h3 className="font-semibold text-gray-800 mb-2">ข้อมูลสำหรับทดสอบ:</h3>
+          <div className="text-sm text-gray-600 space-y-1">
+            <p><strong>อีเมล:</strong> {getDefaultEmail()}</p>
+            <p><strong>รหัสผ่าน:</strong> password123</p>
           </div>
+        </div>
       </div>
     </div>
   );

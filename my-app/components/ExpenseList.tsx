@@ -87,16 +87,34 @@ const AuthenticityScore: React.FC<{ score?: number }> = ({ score }) => {
   if (score === undefined) return null;
   
   const getScoreColor = (score: number) => {
-    if (score >= 0.8) return 'text-success';
-    if (score >= 0.6) return 'text-warning';
+    if (score >= 81) return 'text-success';
+    if (score >= 61) return 'text-success';
+    if (score >= 41) return 'text-warning';
+    if (score >= 21) return 'text-error';
     return 'text-error';
+  };
+
+  const getScoreRange = (score: number) => {
+    if (score >= 81) return '81-100%';
+    if (score >= 61) return '61-80%';
+    if (score >= 41) return '41-60%';
+    if (score >= 21) return '21-40%';
+    return '0-20%';
+  };
+
+  const getScoreLevel = (score: number) => {
+    if (score >= 81) return 'น่าเชื่อถือสูงมาก';
+    if (score >= 61) return 'น่าเชื่อถือสูง';
+    if (score >= 41) return 'น่าเชื่อถือปานกลาง';
+    if (score >= 21) return 'น่าเชื่อถือต่ำ';
+    return 'น่าเชื่อถือต่ำมาก';
   };
 
   return (
     <div className="flex items-center gap-2">
       <span className="text-xs text-secondary">ความน่าเชื่อถือ:</span>
       <span className={`text-sm font-medium ${getScoreColor(score)}`}>
-        {Math.round(score * 100)}%
+        {getScoreRange(score)} ({getScoreLevel(score)})
       </span>
     </div>
   );
@@ -158,6 +176,14 @@ const ClaimDetailModal: React.FC<{ claim: Claim; onClose: () => void; onUpdate: 
                             <p className="text-gray-800 text-sm sm:text-base"><strong>ร้านค้า:</strong> {claim.receiptData.vendor}</p>
                             <p className="text-gray-800 text-sm sm:text-base"><strong>วันที่:</strong> {claim.receiptData.date}</p>
                             <p className="text-gray-800 text-sm sm:text-base"><strong>รวม:</strong> <span className="font-bold text-lg sm:text-xl">{formatCurrency(claim.receiptData.total)}</span></p>
+                            {claim.receiptData.description && (
+                              <div className="text-gray-800 text-sm sm:text-base">
+                                <strong>รายละเอียด:</strong>
+                                <div className="mt-1 p-2 bg-gray-100 rounded text-xs sm:text-sm whitespace-pre-line">
+                                  {claim.receiptData.description}
+                                </div>
+                              </div>
+                            )}
                             <div className="text-gray-800 text-sm sm:text-base">
                                 <strong>รายการ:</strong>
                                 <ul className="list-disc pl-5 mt-1 text-xs sm:text-sm">

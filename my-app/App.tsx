@@ -1,29 +1,35 @@
 
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import ClientApp from './components/ClientApp';
 import HRDashboard from './components/HRDashboard';
-import './styles/theme.css';
+import EmployeeApp from './components/EmployeeApp';
+import ThemeLoader from './components/ThemeLoader';
+import './styles/theme-admin.css';
+import './styles/theme-employee.css';
 
 const App: React.FC = () => {
   return (
     <Router>
+      <ThemeLoader />
       <Routes>
         {/* Landing and Authentication */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login/hr" element={<LoginPage userType="hr" />} />
         <Route path="/login/client" element={<LoginPage userType="client" />} />
         
-        {/* Client Routes */}
-        <Route path="/app-client" element={<ClientApp />} />
-        <Route path="/client" element={<Navigate to="/app-client" replace />} />
+        {/* Employee Routes */}
+        <Route path="/employee" element={<EmployeeApp />} />
+        <Route path="/app-client" element={<EmployeeApp />} />
+        <Route path="/client" element={<Navigate to="/employee" replace />} />
         
         {/* HR Routes */}
         <Route path="/hr" element={<HRDashboard />} />
         <Route path="/hr/analytics" element={<HRDashboard />} />
         <Route path="/hr/expenses" element={<HRDashboard />} />
+        <Route path="/hr/employees" element={<HRDashboard />} />
         <Route path="/admin" element={<Navigate to="/hr" replace />} />
         <Route path="/dashboard" element={<Navigate to="/hr" replace />} />
         

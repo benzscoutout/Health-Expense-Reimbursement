@@ -1,6 +1,9 @@
 
 import { Claim, ClaimStatus } from './types';
 
+// API Configuration
+export const apiBaseUrl = 'http://localhost:5000/api';
+
 // Thai language constants
 export const THAI_TEXT = {
   // Status

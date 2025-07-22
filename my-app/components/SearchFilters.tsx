@@ -2,9 +2,9 @@ import React from 'react';
 import { MagnifyingGlassIcon, FunnelIcon } from './Icons';
 
 interface SearchFiltersProps {
-  activeTab: 'analytics' | 'expenses';
+  activeTab: 'analytics' | 'expenses' | 'employees';
   claimsCount: number;
-  onTabChange: (tab: 'analytics' | 'expenses') => void;
+  onTabChange: (tab: 'analytics' | 'expenses' | 'employees') => void;
   onSearch?: (query: string) => void;
   onStatusFilter?: (status: string) => void;
   onRiskFilter?: (risk: string) => void;

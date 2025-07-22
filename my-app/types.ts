@@ -46,6 +46,7 @@ export interface ReceiptData {
   date: string;
   total: number;
   items: ReceiptItem[];
+  description?: string;
 }
 
 export interface Claim {

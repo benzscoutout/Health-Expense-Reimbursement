@@ -1,10 +1,12 @@
 const functions = require('firebase-functions');
 const express = require('express');
+const { onRequest } = require("firebase-functions/v2/https");
 const cors = require('cors');
 require('dotenv').config({ path: './.env.local' });
 
 const authRoutes = require('./routes/auth');
 const claimsRoutes = require('./routes/claims');
+const employeesRoutes = require('./routes/employees');
 
 const app = express();
 
@@ -16,6 +18,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/claims', claimsRoutes);
+app.use('/api/employees', employeesRoutes);
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
@@ -48,4 +51,7 @@ app.use('*', (req, res) => {
 });
 
 // Export the Express app as a Cloud Function
-exports.apiHealthExpense = functions.https.onRequest(app); 
+exports.apiHealthExpense = onRequest({ 
+  region: 'asia-southeast1',
+  cors: true 
+}, app);

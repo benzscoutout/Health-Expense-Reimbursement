@@ -308,20 +308,30 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ claims }) => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">คะแนนความน่าเชื่อถือเฉลี่ย</h3>
           <div className="text-center">
             <div className="text-4xl font-bold text-gray-900 mb-2">
-              {Math.round(averageAuthenticityScore * 100)}%
+              {(() => {
+                if (averageAuthenticityScore >= 81) return '81-100%';
+                if (averageAuthenticityScore >= 61) return '61-80%';
+                if (averageAuthenticityScore >= 41) return '41-60%';
+                if (averageAuthenticityScore >= 21) return '21-40%';
+                return '0-20%';
+              })()}
             </div>
             <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
               <div 
                 className={`h-4 rounded-full ${
-                  averageAuthenticityScore >= 0.8 ? 'bg-green-500' :
-                  averageAuthenticityScore >= 0.6 ? 'bg-yellow-500' : 'bg-red-500'
+                  averageAuthenticityScore >= 81 ? 'bg-green-500' :
+                  averageAuthenticityScore >= 61 ? 'bg-green-400' :
+                  averageAuthenticityScore >= 41 ? 'bg-yellow-500' :
+                  averageAuthenticityScore >= 21 ? 'bg-red-400' : 'bg-red-500'
                 }`}
-                style={{ width: `${averageAuthenticityScore * 100}%` }}
+                style={{ width: `${averageAuthenticityScore}%` }}
               ></div>
             </div>
             <p className="text-sm text-gray-600">
-              {averageAuthenticityScore >= 0.8 ? 'คุณภาพดี' :
-               averageAuthenticityScore >= 0.6 ? 'คุณภาพปานกลาง' : 'ต้องตรวจสอบเพิ่มเติม'}
+              {averageAuthenticityScore >= 81 ? 'คุณภาพดีมาก' :
+               averageAuthenticityScore >= 61 ? 'คุณภาพดี' :
+               averageAuthenticityScore >= 41 ? 'คุณภาพปานกลาง' :
+               averageAuthenticityScore >= 21 ? 'คุณภาพต่ำ' : 'ต้องตรวจสอบเพิ่มเติม'}
             </p>
           </div>
         </div>

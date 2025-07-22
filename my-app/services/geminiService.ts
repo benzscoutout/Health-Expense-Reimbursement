@@ -56,17 +56,31 @@ export async function analyzeReceiptForFraud(base64Image: string): Promise<Recei
           "confidence": 0.0-1.0
         }
       ],
-      "authenticityScore": 0.0-1.0,
+      "authenticityScore": 0-100,
       "recommendations": ["ข้อเสนอแนะสำหรับฝ่ายบุคคล"]
     }
     
     ตรวจสอบ:
-    1. สัญญาณการแก้ไขรูปภาพ (เบลอ, ข้อบกพร่อง, แสงไม่สม่ำเสมอ)
-    2. รูปแบบที่น่าสงสัย (จำนวนเงินกลม, จำนวนเงินผิดปกติ)
-    3. ความไม่สอดคล้องของชื่อร้านค้า
-    4. ความผิดปกติของวันที่ (วันที่ในอนาคต, วันที่เก่าเกินไป)
-    5. ความไม่สอดคล้องของรูปแบบใบเสร็จ
-    6. องค์ประกอบใบเสร็จที่ขาดหายไปหรือไม่ชัดเจน
+    - สัญญาณการแก้ไขรูปภาพ (เบลอ, ข้อบกพร่อง, แสงไม่สม่ำเสมอ)
+    - รูปแบบที่น่าสงสัย (จำนวนเงินผิดปกติ)
+    - ความไม่สอดคล้องของชื่อร้านค้า
+    - ความผิดปกติของวันที่ (วันที่ในอนาคต, วันที่เก่าเกินไป)
+    - ความไม่สอดคล้องของรูปแบบใบเสร็จ
+    - องค์ประกอบใบเสร็จที่ขาดหายไปหรือไม่ชัดเจน
+    - ใบเสร็จที่เขียนด้วยลายมือ
+    - ใบเสร็จที่ ไม่น่าเชื่อถือ
+    - ใบเสร็จที่มีอยู่ใน internet หรือมีการดึงข้อมูลจาก internet
+    
+    ให้คะแนนความน่าเชื่อถือ (authenticityScore) เป็นเปอร์เซ็นต์ 0-100 โดยแบ่งเป็น 5 ระดับ:
+    - 0-20: น่าเชื่อถือต่ำมาก (ไม่น่าเชื่อถือ)
+    - 21-40: น่าเชื่อถือต่ำ
+    - 41-60: น่าเชื่อถือปานกลาง
+    - 61-80: น่าเชื่อถือสูง
+    - 81-100: น่าเชื่อถือสูงมาก (น่าเชื่อถือมาก)
+
+    ใน description สามารถใส่ได้มากกว่า 1 เหตุผลที่ตรวจสอบเจอ
+
+
   `;
 
   try {
@@ -95,7 +109,7 @@ export async function analyzeReceiptForFraud(base64Image: string): Promise<Recei
     return {
       receiptData: parsedData.receiptData,
       fraudIndicators: parsedData.fraudIndicators || [],
-      authenticityScore: Math.max(0, Math.min(1, parsedData.authenticityScore)),
+      authenticityScore: Math.max(0, Math.min(100, parsedData.authenticityScore)),
       recommendations: parsedData.recommendations || []
     };
   } catch (error) {

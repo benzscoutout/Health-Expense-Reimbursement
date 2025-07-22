@@ -76,16 +76,34 @@ const AuthenticityScore: React.FC<{ score?: number }> = ({ score }) => {
   if (score === undefined) return null;
   
   const getScoreColor = (score: number) => {
-    if (score >= 0.8) return 'text-green-600';
-    if (score >= 0.6) return 'text-yellow-600';
+    if (score >= 81) return 'text-green-600';
+    if (score >= 61) return 'text-green-600';
+    if (score >= 41) return 'text-yellow-600';
+    if (score >= 21) return 'text-red-600';
     return 'text-red-600';
+  };
+
+  const getScoreRange = (score: number) => {
+    if (score >= 81) return '81-100%';
+    if (score >= 61) return '61-80%';
+    if (score >= 41) return '41-60%';
+    if (score >= 21) return '21-40%';
+    return '0-20%';
+  };
+
+  const getScoreLevel = (score: number) => {
+    if (score >= 81) return 'น่าเชื่อถือสูงมาก';
+    if (score >= 61) return 'น่าเชื่อถือสูง';
+    if (score >= 41) return 'น่าเชื่อถือปานกลาง';
+    if (score >= 21) return 'น่าเชื่อถือต่ำ';
+    return 'น่าเชื่อถือต่ำมาก';
   };
 
   return (
     <div className="flex items-center gap-2">
       <span className="text-xs text-gray-600">ความน่าเชื่อถือ:</span>
       <span className={`text-sm font-medium ${getScoreColor(score)}`}>
-        {Math.round(score * 100)}%
+        {getScoreRange(score)} ({getScoreLevel(score)})
       </span>
     </div>
   );

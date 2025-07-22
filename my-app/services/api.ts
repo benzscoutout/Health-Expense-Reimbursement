@@ -1,5 +1,64 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
+// Employee Types
+export interface Employee {
+  id: string;
+  employeeId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  department: string;
+  position: string;
+  hireDate: string;
+  status: 'active' | 'inactive' | 'terminated';
+  salary: number;
+  manager: string | null;
+  emergencyContact: {
+    name: string;
+    phone: string;
+    relationship: string;
+  };
+  address: {
+    street: string;
+    city: string;
+    postalCode: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EmployeeStats {
+  totalEmployees: number;
+  activeEmployees: number;
+  inactiveEmployees: number;
+  terminatedEmployees: number;
+  departmentStats: Record<string, number>;
+  averageSalary: number;
+}
+
+export interface EmployeeListResponse {
+  employees: Employee[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
+  filters: {
+    departments: string[];
+    statuses: string[];
+  };
+}
+
+export interface EmployeeFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  department?: string;
+  status?: string;
+}
+
 // Helper function to get auth headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
@@ -193,6 +252,112 @@ export const claimsAPI = {
       throw new Error(error.message || 'เกิดข้อผิดพลาดในการเพิ่มบันทึก');
     }
     
+    return response.json();
+  },
+};
+
+// Employee API calls
+export const employeeAPI = {
+  // Get all employees with filters
+  getEmployees: async (filters: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    department?: string;
+    status?: string;
+  } = {}) => {
+    const params = new URLSearchParams();
+    
+    if (filters.page) params.append('page', filters.page.toString());
+    if (filters.limit) params.append('limit', filters.limit.toString());
+    if (filters.search) params.append('search', filters.search);
+    if (filters.department) params.append('department', filters.department);
+    if (filters.status) params.append('status', filters.status);
+
+    const response = await fetch(`${API_BASE_URL}/employees?${params.toString()}`, {
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'เกิดข้อผิดพลาดในการดึงข้อมูลพนักงาน');
+    }
+
+    return response.json();
+  },
+
+  // Get employee by ID
+  getEmployee: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/employees/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'เกิดข้อผิดพลาดในการดึงข้อมูลพนักงาน');
+    }
+
+    return response.json();
+  },
+
+  // Create new employee
+  createEmployee: async (employeeData: any) => {
+    const response = await fetch(`${API_BASE_URL}/employees`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(employeeData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'เกิดข้อผิดพลาดในการเพิ่มพนักงาน');
+    }
+
+    return response.json();
+  },
+
+  // Update employee
+  updateEmployee: async (id: string, employeeData: any) => {
+    const response = await fetch(`${API_BASE_URL}/employees/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(employeeData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'เกิดข้อผิดพลาดในการอัปเดตข้อมูลพนักงาน');
+    }
+
+    return response.json();
+  },
+
+  // Delete employee (soft delete)
+  deleteEmployee: async (id: string) => {
+    const response = await fetch(`${API_BASE_URL}/employees/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'เกิดข้อผิดพลาดในการลบพนักงาน');
+    }
+
+    return response.json();
+  },
+
+  // Get employee statistics
+  getEmployeeStats: async () => {
+    const response = await fetch(`${API_BASE_URL}/employees/stats/overview`, {
+      headers: getAuthHeaders(),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'เกิดข้อผิดพลาดในการดึงสถิติพนักงาน');
+    }
+
     return response.json();
   },
 };

@@ -312,7 +312,7 @@ router.post('/', auth, async (req, res) => {
           await Promise.all(fileWrites);
 
           // Extract form data
-          const { vendor, date, total, items } = fields;
+          const { vendor, date, total, items, description } = fields;
           
           if (!vendor || !date || !total) {
             // Clean up uploaded file
@@ -354,7 +354,8 @@ router.post('/', auth, async (req, res) => {
             vendor,
             date,
             total: parseFloat(total),
-            items: items ? JSON.parse(items) : []
+            items: items ? JSON.parse(items) : [],
+            description: description || ''
           };
 
           // Perform fraud detection
