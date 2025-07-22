@@ -1,13 +1,35 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Claim, ClaimStatus } from '../types';
-import Header from './Header';
-import AdminDashboard from './dashboards/AdminDashboard';
+import Sidebar from './Sidebar';
+import TopNavigation from './TopNavigation';
+import SearchFilters from './SearchFilters';
+import ExpenseList from './ExpenseList';
+import AnalyticsDashboard from './AnalyticsDashboard';
 import { claimsAPI } from '../services/api';
 
 const HRDashboard: React.FC = () => {
   const [claims, setClaims] = useState<Claim[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Determine active tab from URL
+  const getActiveTab = () => {
+    if (location.pathname.includes('/expenses')) return 'expenses';
+    if (location.pathname.includes('/analytics')) return 'analytics';
+    return 'analytics'; // default to analytics
+  };
+
+  const [activeTab, setActiveTab] = useState<'analytics' | 'expenses'>(getActiveTab());
+
+  // Update active tab when URL changes
+  useEffect(() => {
+    setActiveTab(getActiveTab());
+  }, [location.pathname]);
 
   // Load all claims for HR
   useEffect(() => {
@@ -37,11 +59,54 @@ const HRDashboard: React.FC = () => {
     }
   }, []);
 
+  const handleTabChange = (tab: 'analytics' | 'expenses') => {
+    setActiveTab(tab);
+    // Update URL based on tab
+    if (tab === 'analytics') {
+      navigate('/hr/analytics', { replace: true });
+    } else {
+      navigate('/hr/expenses', { replace: true });
+    }
+  };
+
+  const handleLogout = () => {
+    // Handle logout logic here
+    navigate('/');
+  };
+
+  const handleCreateNewClaim = () => {
+    // Handle create new claim logic here
+    console.log('Create new claim clicked');
+  };
+
+  const handleSearch = (query: string) => {
+    // Handle search logic here
+    console.log('Search query:', query);
+  };
+
+  const handleStatusFilter = (status: string) => {
+    // Handle status filter logic here
+    console.log('Status filter:', status);
+  };
+
+  const handleRiskFilter = (risk: string) => {
+    // Handle risk filter logic here
+    console.log('Risk filter:', risk);
+  };
+
+  const handleSidebarToggle = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
+  const handleMobileSidebarToggle = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen gradient-bg text-black font-sans flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto mb-4"></div>
           <p className="text-gray-600">กำลังโหลดข้อมูล...</p>
         </div>
       </div>
@@ -50,12 +115,12 @@ const HRDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen gradient-bg text-black font-sans flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            className="btn btn-primary"
           >
             ลองใหม่
           </button>
@@ -65,11 +130,59 @@ const HRDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen gradient-bg text-black font-sans">
-      <Header />
-      <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        <AdminDashboard claims={claims} updateClaim={updateClaim} />
+    <div className="dashboard-layout">
+      {/* Sidebar */}
+      <Sidebar 
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        onLogout={handleLogout}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={handleSidebarToggle}
+        isMobileOpen={sidebarOpen}
+      />
+
+      {/* Main Content */}
+      <main className="main-content">
+        {/* Top Navigation */}
+        <TopNavigation 
+          activeTab={activeTab}
+          onCreateNewClaim={handleCreateNewClaim}
+        />
+
+        {/* Page Header */}
+        <div className="page-header">
+          <h1 className="page-title">
+            {activeTab === 'analytics' ? 'วิเคราะห์ข้อมูล' : 'รายการค่าใช้จ่าย'}
+          </h1>
+          <p className="page-subtitle">
+            {activeTab === 'analytics' 
+              ? 'ภาพรวมและสถิติการเบิกจ่ายค่าใช้จ่ายด้านสุขภาพ' 
+              : 'จัดการคำร้องค่าใช้จ่ายด้านสุขภาพทั้งหมด'
+            }
+          </p>
+        </div>
+
+        {/* Search and Filters */}
+        {/* <SearchFilters 
+          activeTab={activeTab}
+          claimsCount={claims.length}
+          onTabChange={handleTabChange}
+          onSearch={handleSearch}
+          onStatusFilter={handleStatusFilter}
+          onRiskFilter={handleRiskFilter}
+        /> */}
+
+        {/* Tab Content */}
+        <div className="p-6">
+          {activeTab === 'analytics' ? (
+            <AnalyticsDashboard claims={claims} />
+          ) : (
+            <ExpenseList claims={claims} updateClaim={updateClaim} />
+          )}
+        </div>
       </main>
+
+     
     </div>
   );
 };
